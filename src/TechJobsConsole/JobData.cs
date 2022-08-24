@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -42,6 +43,7 @@ namespace TechJobsConsole
         {
             // load data, if not already loaded
             LoadData();
+            StringComparison compared = StringComparison.OrdinalIgnoreCase;
 
             List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
 
@@ -49,7 +51,7 @@ namespace TechJobsConsole
             {
                 string aValue = row[column];
 
-                if (aValue.Contains(value))
+                if (aValue.Contains(value, compared))
                 {
                     jobs.Add(row);
                 }
@@ -60,6 +62,7 @@ namespace TechJobsConsole
 
         /*
          * Load and parse data from job_data.csv
+         * 
          */
         private static void LoadData()
         {
@@ -137,6 +140,33 @@ namespace TechJobsConsole
             valueBuilder.Clear();
 
             return rowValues.ToArray();
+        }
+        public static List<Dictionary<string, string>> FindByValue(string query)
+        {
+            //can't hurt to cover bases ;)
+            LoadData();
+            StringComparison compared = StringComparison.OrdinalIgnoreCase;
+            List<Dictionary<string, string>> results = new List<Dictionary<string, string>>();
+
+            foreach (Dictionary<string, string> row in AllJobs)
+            {
+                foreach (string key in row.Keys)
+                {
+                    if (key.Contains(query, compared) && !results.Contains(row))
+                    {
+                        results.Add(row);
+                    }
+                }
+                foreach (string value in row.Values)
+                {
+                    if (value.Contains(query, compared) && !results.Contains(row)) 
+                    { 
+                        results.Add(row);
+                    }
+                }
+            }
+
+            return results;
         }
     }
 }
